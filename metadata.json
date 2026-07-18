@@ -1,0 +1,6 @@
+{
+  "name": "تِجربة (Tajrubah)",
+  "description": "منصة ذكية للتجارب المحلية والسفر الذكي في اليمن، مدعومة بالذكاء الاصطناعي لتصميم رحلات مخصصة واكتشاف تجارب ثقافية وسياحية فريدة.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
