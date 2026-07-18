@@ -18,6 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -69,7 +71,7 @@ fun TajrubahApp(viewModel: TajrubahViewModel) {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Discover.route) {
-                DiscoverScreen(viewModel = viewModel)
+                DiscoverScreen(viewModel = viewModel, navController = navController)
             }
             composable(Screen.AIPlanner.route) {
                 AIPlannerScreen(viewModel = viewModel)
@@ -149,8 +151,9 @@ fun formatCurrency(amount: Double): String {
 
 // --- DISCOVER SCREEN ---
 @Composable
-fun DiscoverScreen(viewModel: TajrubahViewModel) {
+fun DiscoverScreen(viewModel: TajrubahViewModel, navController: NavController) {
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
     var selectedCategory by remember { mutableStateOf("All") }
     var searchQuery by remember { mutableStateOf("") }
     var selectedExperienceForBooking by remember { mutableStateOf<LocalExperience?>(null) }
@@ -177,74 +180,240 @@ fun DiscoverScreen(viewModel: TajrubahViewModel) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Hero Header Banner
+        // High Density Premium Brand Header Row
         item {
-            Card(
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(180.dp),
-                shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                    .padding(bottom = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    // Dark elegant gradient with traditional amber light elements
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    // "ت" Badge (Traditional Clay mud tower feel)
                     Box(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .background(
-                                brush = Brush.verticalGradient(
-                                    colors = listOf(
-                                        MaterialTheme.colorScheme.primary,
-                                        MaterialTheme.colorScheme.secondary.copy(alpha = 0.8f)
-                                    )
-                                )
-                            )
-                    )
-                    
-                    // Arabic Typography and Calligraphy look
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(20.dp),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.End
+                            .size(42.dp)
+                            .background(MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(12.dp)),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = "منصة تِجربة المحلية",
-                            color = Color.White,
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            textAlign = TextAlign.Right
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = "اكتشف أصالة اليمن السعيد واحجز تجارب فريدة يعيشها أهل البلد",
-                            color = Color.White.copy(alpha = 0.9f),
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium,
-                            textAlign = TextAlign.Right
-                        )
+                        Text("ت", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                    }
+                    Column {
+                        Text("تِجربة", fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.onBackground)
+                        Text("TAJRUBAH PLATFORM", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                    }
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    // Notification badge
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .background(MaterialTheme.colorScheme.surface, shape = CircleShape)
+                            .border(1.dp, Color(0xFFEBE1D4), CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("🔔", fontSize = 16.sp)
+                    }
+                    // Profile initials badge
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .background(MaterialTheme.colorScheme.primary, shape = CircleShape)
+                            .border(2.dp, Color.White, CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        val initials = if (uiState.userProfile.name.length >= 2) uiState.userProfile.name.substring(0, 2).uppercase() else "RM"
+                        Text(initials, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                     }
                 }
             }
         }
 
-        // Search Bar
+        // High Density Interactive Search Bar
         item {
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                placeholder = { Text("ابحث عن تجربة، مدينة أو نشاط...") },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "بحث") },
+                placeholder = { Text("اكتشف اليمن... Search Experiences") },
+                leadingIcon = { Text("🔍", fontSize = 16.sp, modifier = Modifier.padding(start = 12.dp)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .testTag("search_field"),
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(16.dp),
                 colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White,
                     focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+                    unfocusedBorderColor = Color(0xFFEBE1D4)
                 )
             )
+        }
+
+        // High Density AI Smart Planner Card
+        item {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        navController.navigate(Screen.AIPlanner.route) {
+                            popUpTo(navController.graph.startDestinationId) { saveState = true }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            ) {
+                Box(modifier = Modifier.fillMaxWidth().padding(18.dp)) {
+                    Column(modifier = Modifier.align(Alignment.CenterStart).fillMaxWidth(0.82f)) {
+                        Box(
+                            modifier = Modifier
+                                .background(Color.White.copy(alpha = 0.2f), shape = RoundedCornerShape(12.dp))
+                                .padding(horizontal = 8.dp, vertical = 2.dp)
+                        ) {
+                            Text("AI Smart Planner", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                        }
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text("خطط لرحلتك القادمة بالذكاء الاصطناعي", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                        Text("احصل على جدول متكامل حسب ميزانيتك واهتماماتك", color = Color.White.copy(alpha = 0.85f), fontSize = 12.sp)
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Button(
+                            onClick = {
+                                navController.navigate(Screen.AIPlanner.route) {
+                                    popUpTo(navController.graph.startDestinationId) { saveState = true }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFDC96)),
+                            shape = RoundedCornerShape(24.dp)
+                        ) {
+                            Text("ابدأ التخطيط الآن • Start Planning", color = Color(0xFF251A00), fontWeight = FontWeight.Bold, fontSize = 11.sp)
+                        }
+                    }
+                    Text(
+                        text = "✨",
+                        fontSize = 72.sp,
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .offset(x = 8.dp, y = 8.dp)
+                            .graphicsLayer(alpha = 0.25f)
+                    )
+                }
+            }
+        }
+
+        // High Density 4-Column Quick Category Grid
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                // Hotels Option
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable {
+                            navController.navigate(Screen.Services.route) {
+                                popUpTo(navController.graph.startDestinationId) { saveState = true }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        },
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(1f)
+                            .background(Color(0xFFFFDDA1), shape = RoundedCornerShape(16.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("🏨", fontSize = 24.sp)
+                    }
+                    Text("فنادق", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
+                }
+
+                // Cars Option
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable {
+                            navController.navigate(Screen.Services.route) {
+                                popUpTo(navController.graph.startDestinationId) { saveState = true }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        },
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(1f)
+                            .background(Color(0xFFD1E4FF), shape = RoundedCornerShape(16.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("🚗", fontSize = 24.sp)
+                    }
+                    Text("سيارات", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
+                }
+
+                // Guides Option
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable {
+                            navController.navigate(Screen.Services.route) {
+                                popUpTo(navController.graph.startDestinationId) { saveState = true }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        },
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(1f)
+                            .background(Color(0xFFC1F1C1), shape = RoundedCornerShape(16.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("🗺️", fontSize = 24.sp)
+                    }
+                    Text("مرشدين", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
+                }
+
+                // Experiences/Culture Option
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable {
+                            selectedCategory = "All"
+                        },
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(1f)
+                            .background(Color(0xFFFBCFFF), shape = RoundedCornerShape(16.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("☕", fontSize = 24.sp)
+                    }
+                    Text("تجارب", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
+                }
+            }
         }
 
         // Category Row Selector
@@ -1259,11 +1428,10 @@ fun BookingItemRow(booking: Booking, onCancelClick: () -> Unit) {
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                fontSize = 12.sp
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("التاريخ: ${booking.bookingDate}", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
-                Text("العدد/المدة: ${booking.slotsOrDays}", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                Text("التاريخ: ${booking.bookingDate}", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f), fontSize = 12.sp)
+                Text("العدد/المدة: ${booking.slotsOrDays}", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f), fontSize = 12.sp)
             }
 
             Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))

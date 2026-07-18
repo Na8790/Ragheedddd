@@ -13,35 +13,34 @@ import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme =
   darkColorScheme(
-    primary = AccentTeal,
-    secondary = AmberGlow,
-    tertiary = SanaaTerracotta,
+    primary = HighDensitySecondary,
+    secondary = HighDensityPrimary,
+    tertiary = HighDensityTertiary,
     background = NightIndigo,
     surface = NightSurface,
-    onPrimary = Color(0xFF0C131A),
-    onSecondary = Color(0xFF0C131A),
-    onBackground = GypsumWhite,
-    onSurface = GypsumWhite
+    onPrimary = NightIndigo,
+    onSecondary = Color.White,
+    onBackground = Color.White,
+    onSurface = Color.White
   )
 
 private val LightColorScheme =
   lightColorScheme(
-    primary = YamanIndigo,
-    secondary = SanaaTerracotta,
-    tertiary = YemeniAmber,
-    background = SandBackground,
-    surface = GypsumWhite,
-    onPrimary = GypsumWhite,
-    onSecondary = GypsumWhite,
-    onBackground = YamanIndigo,
-    onSurface = YamanIndigo
+    primary = HighDensityPrimary,
+    secondary = HighDensitySecondary,
+    tertiary = HighDensityTertiary,
+    background = HighDensityBackground,
+    surface = HighDensitySurface,
+    onPrimary = Color.White,
+    onSecondary = HighDensityTextDark,
+    onBackground = HighDensityTextDark,
+    onSurface = HighDensityTextDark
   )
 
 @Composable
 fun MyApplicationTheme(
   darkTheme: Boolean = isSystemInDarkTheme(),
-  // Dynamic color is available on Android 12+
-  dynamicColor: Boolean = true,
+  dynamicColor: Boolean = false, // Set to false to preserve the customized brand color scheme
   content: @Composable () -> Unit,
 ) {
   val colorScheme =
